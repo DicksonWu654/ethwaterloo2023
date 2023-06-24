@@ -1,35 +1,27 @@
+// Some code from: https://github.com/sismo-core/sismo-connect-boilerplate-onchain/blob/main/src/Airdrop.sol
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./friendfi_general.sol";
-import "./IWorldID.sol";
+import "@sismo-core/sismo-connect-solidity/contracts/libs/SismoLib.sol";
 
-contract FriendFiWorldCoin is FriendFi {
-    mapping(address => bool) public verified_worldcoin_users;
-    IWorldID public worldID;
+contract FriendFiWorldCoin is FriendFi, SismoConnect {
+    mapping(address => bool) public verified_sismo_users;
+    using SismoConnectHelper for SismoConnectVerifiedResult;
 
-    constructor(address _worldID) {
-        worldID = IWorldID(_worldID);
+    constructor(bytes16 appId, bool isImpersonationMode) {
+        SismoConnect(buildConfig(appId, isImpersonationMode));
     }
 
-    function whitelist_yourself(
-        uint256 root,
-        uint256 groupId,
-        uint256 signalHash,
-        uint256 nullifierHash,
-        uint256 externalNullifierHash,
-        uint256[8] calldata proof
-    ) public {
-        worldID.verifyProof(
-            root,
-            groupId,
-            signalHash,
-            nullifierHash,
-            externalNullifierHash,
-            proof
-        );
-        verified_worldcoin_users[msg.sender] = true;
+    function whitelist_yourself(bytes memory response) public {
+        SismoConnectVerifiedResult memory result = verify({
+            responseBytes: response,
+            auth: buildAuth({authType: AuthType.VAULT})
+        });
+
+        verified_sismo_users[msg.sender] = true;
     }
 
     function create_loan(
@@ -42,7 +34,7 @@ contract FriendFiWorldCoin is FriendFi {
     ) public override {
         require(scores[msg.sender] >= scoreStaked, "Insufficient score");
         require(
-            verified_worldcoin_users[msg.sender] == true,
+            verified_sismo_users[msg.sender] == true,
             "You must be a verified worldcoin user"
         );
 
@@ -66,7 +58,7 @@ contract FriendFiWorldCoin is FriendFi {
 
     function lend(address borrower, uint256 loanIndex) public override {
         require(
-            verified_worldcoin_users[msg.sender] == true,
+            verified_sismo_users[msg.sender] == true,
             "You must be a verified worldcoin user"
         );
         require(loanIndex < loans[borrower].length, "Invalid loan index");
@@ -94,7 +86,7 @@ contract FriendFiWorldCoin is FriendFi {
         uint256 scoreStaked
     ) public override {
         require(
-            verified_worldcoin_users[msg.sender] == true,
+            verified_sismo_users[msg.sender] == true,
             "You must be a verified worldcoin user"
         );
         require(scores[msg.sender] >= scoreStaked, "Insufficient score");

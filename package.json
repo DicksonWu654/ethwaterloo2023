@@ -6,6 +6,8 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.2",
+    "@sismo-core/sismo-connect-react": "^0.0.15",
+    "@sismo-core/sismo-connect-solidity": "^0.0.7",
     "openzeppelin-solidity": "^3.4.2"
   }
 }
