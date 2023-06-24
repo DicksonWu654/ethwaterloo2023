@@ -32,7 +32,7 @@ contract FriendFi {
         uint256 interest,
         address asset_address,
         uint256 amountOwed
-    ) public {
+    ) public virtual {
         require(scores[msg.sender] >= scoreStaked, "Insufficient score");
 
         Loan memory newLoan = Loan({
@@ -53,7 +53,7 @@ contract FriendFi {
         loans[msg.sender].push(newLoan);
     }
 
-    function lend(address borrower, uint256 loanIndex) public {
+    function lend(address borrower, uint256 loanIndex) public virtual {
         require(loanIndex < loans[borrower].length, "Invalid loan index");
         require(!loans[borrower][loanIndex].settled, "Loan already settled");
         require(!loans[borrower][loanIndex].started, "Loan already started");
@@ -77,7 +77,7 @@ contract FriendFi {
         address borrower,
         uint256 loanIndex,
         uint256 scoreStaked
-    ) public {
+    ) public virtual {
         require(scores[msg.sender] >= scoreStaked, "Insufficient score");
         require(loanIndex < loans[borrower].length, "Invalid loan index");
         require(!loans[borrower][loanIndex].settled, "Loan already settled");
