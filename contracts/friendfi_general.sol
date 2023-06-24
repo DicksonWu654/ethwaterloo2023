@@ -110,44 +110,46 @@ contract FriendFi {
     }
 
     function settle(
-        address lender,
+        address borrower,
         uint256 loanIndex,
         uint256 scoreToBurnOG,
         uint256 scoreToBurnAttestor
     ) public {
+        require(msg.sender == loans[borrower][loanIndex].lender, "Not lender");
         require(
-            loans[lender][loanIndex].scoreStakedOg >= scoreToBurnOG,
+            loans[borrower][loanIndex].scoreStakedOg >= scoreToBurnOG,
             "Insufficient score OG"
         );
         require(
-            loans[lender][loanIndex].scoreStakedAttestor >= scoreToBurnAttestor
+            loans[borrower][loanIndex].scoreStakedAttestor >=
+                scoreToBurnAttestor
         );
-        require(loanIndex < loans[lender].length, "Invalid loan index");
-        require(!loans[lender][loanIndex].settled, "Loan already settled");
-        require(loans[lender][loanIndex].started, "Loan not started");
+        require(loanIndex < loans[borrower].length, "Invalid loan index");
+        require(!loans[borrower][loanIndex].settled, "Loan already settled");
+        require(loans[borrower][loanIndex].started, "Loan not started");
         require(
-            loans[lender][loanIndex].loan_termination_date < block.timestamp,
+            loans[borrower][loanIndex].loan_termination_date < block.timestamp,
             "Loan not yet due"
         );
 
-        loans[lender][loanIndex].settled = true;
+        loans[borrower][loanIndex].settled = true;
 
         // subtraction, but if we're subtracting more than they have make it 0:
 
-        if (scores[lender] < scoreToBurnOG) {
-            scores[lender] = 0;
+        if (scores[borrower] < scoreToBurnOG) {
+            scores[borrower] = 0;
         } else {
-            scores[lender] -= scoreToBurnOG;
+            scores[borrower] -= scoreToBurnOG;
         }
 
         if (
-            scores[loans[lender][loanIndex].attestor_address] <
+            scores[loans[borrower][loanIndex].attestor_address] <
             scoreToBurnAttestor
         ) {
-            scores[loans[lender][loanIndex].attestor_address] = 0;
+            scores[loans[borrower][loanIndex].attestor_address] = 0;
         } else {
             scores[
-                loans[lender][loanIndex].attestor_address
+                loans[borrower][loanIndex].attestor_address
             ] -= scoreToBurnAttestor;
         }
     }
