@@ -2,6 +2,10 @@
 
 Friend To Friend Social-Credit Lending Platform
 
+# TODO SUMARY
+
+---
+
 # Contract addresses:
 ## Base implementation:
 Polygon ZKEVM Testnet: [0x0CE00904629C7e8D5D871885fc9684F451e8613C](https://testnet-zkevm.polygonscan.com/address/0x0CE00904629C7e8D5D871885fc9684F451e8613C#code)
@@ -20,3 +24,10 @@ Polygon Mumbai: [0xfc8461950223D5C9A9343609487683e44d0F9933](https://mumbai.poly
 
 ## Sismo implementation:
 Polygon Mumbai: [0x683Ec937602f602613078B8371df886d47E00EC3](https://mumbai.polygonscan.com/address/0x683Ec937602f602613078B8371df886d47E00EC3#code)
+
+---
+
+Polygon #onPolygon:
+- Contract with verified code on ZKEVM Testnet: [0x0CE00904629C7e8D5D871885fc9684F451e8613C](https://testnet-zkevm.polygonscan.com/address/0x0CE00904629C7e8D5D871885fc9684F451e8613C#code)
+- Tweet link: https://twitter.com/DicksonWuML/status/1672740538229956610?s=20
+
