@@ -45,14 +45,15 @@ contract FriendFiPolygonId is FriendFi, ZKPVerifier {
         // whitelist address
         if (idToAddress[id] == address(0)) {
             verified_polygonid_users[_msgSender()] = true;
+            initialize_user();
         }
     }
 
     function create_loan(
         uint256 scoreStaked,
-        uint256 daystoExpiry,
-        uint256 daysToPayBack,
-        uint256 interest,
+        uint256 timeToExpiry,
+        uint256 timeToPayBack,
+        // uint256 interest,
         address asset_address,
         uint256 amountOwed
     ) public override {
@@ -62,31 +63,27 @@ contract FriendFiPolygonId is FriendFi, ZKPVerifier {
         );
         super.create_loan(
             scoreStaked,
-            daystoExpiry,
-            daysToPayBack,
-            interest,
+            timeToExpiry,
+            timeToPayBack,
+            // interest,
             asset_address,
             amountOwed
         );
     }
 
-    function lend(address borrower, uint256 loanIndex) public override {
+    function lend(uint256 loanIndex) public override {
         require(
             verified_polygonid_users[msg.sender] == true,
             "You must be a verified worldcoin user"
         );
-        super.lend(borrower, loanIndex);
+        super.lend(loanIndex);
     }
 
-    function attest(
-        address borrower,
-        uint256 loanIndex,
-        uint256 scoreStaked
-    ) public override {
+    function attest(uint256 loanIndex, uint256 scoreStaked) public override {
         require(
             verified_polygonid_users[msg.sender] == true,
             "You must be a verified worldcoin user"
         );
-        super.attest(borrower, loanIndex, scoreStaked);
+        super.attest(loanIndex, scoreStaked);
     }
 }
