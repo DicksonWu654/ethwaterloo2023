@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./friendfi_general.sol";
 import "@sismo-core/sismo-connect-solidity/contracts/libs/SismoLib.sol";
 
-contract FriendFiWorldCoin is FriendFi, SismoConnect {
+contract FriendFiSismo is FriendFi, SismoConnect {
     mapping(address => bool) public verified_sismo_users;
     using SismoConnectHelper for SismoConnectVerifiedResult;
 
