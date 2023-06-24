@@ -4,14 +4,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract FriendFi {
-    // struct StakeScoreStruct {
-    //     address staker;
-    //     uint256 scoreStaked;
-    // }
+    // TODo figure out how to do the array thing / arbitrary amount of attestors
 
-    // gonna make a list of StakeScoreStructs for attestations
     struct Loan {
-        // StakeScoreStruct[] stake_scores;
         uint256 expirationDate;
         uint256 daysToPayBack;
         uint256 loan_termination_date;
@@ -21,6 +16,9 @@ contract FriendFi {
         address asset_address;
         uint256 amountOwed;
         address lender;
+        uint256 scoreStakedOg;
+        address attestor_address;
+        uint256 scoreStakedAttestor;
     }
 
     // make this a soulbound erc20 (if that exists lol)
@@ -37,23 +35,20 @@ contract FriendFi {
     ) public {
         require(scores[msg.sender] >= scoreStaked, "Insufficient score");
 
-        // StakeScoreStruct memory stakeScore = StakeScoreStruct({
-        //     staker: msg.sender,
-        //     scoreStaked: scoreStaked
-        // });
-
-        Loan memory newLoan;
-        newLoan.expirationDate = block.timestamp + daystoExpiry * 1 days;
-        newLoan.daysToPayBack = daysToPayBack;
-        newLoan.loan_termination_date = 0;
-        newLoan.interest = interest;
-        newLoan.settled = false;
-        newLoan.started = false;
-        newLoan.asset_address = asset_address;
-        newLoan.amountOwed = amountOwed;
-        newLoan.lender = address(0);
-
-        // newLoan.stake_scores[0] = stakeScore;
+        Loan memory newLoan = Loan({
+            expirationDate: block.timestamp + daystoExpiry * 1 days,
+            daysToPayBack: daysToPayBack,
+            loan_termination_date: 0,
+            interest: interest,
+            settled: false,
+            started: false,
+            asset_address: asset_address,
+            amountOwed: amountOwed,
+            lender: 0x0000000000000000000000000000000000000000,
+            scoreStakedOg: scoreStaked,
+            attestor_address: 0x0000000000000000000000000000000000000000,
+            scoreStakedAttestor: 0
+        });
 
         loans[msg.sender].push(newLoan);
     }
@@ -88,12 +83,8 @@ contract FriendFi {
         require(!loans[borrower][loanIndex].settled, "Loan already settled");
         require(!loans[borrower][loanIndex].started, "Loan already started");
 
-        // StakeScoreStruct memory stakeScore = StakeScoreStruct({
-        //     staker: msg.sender,
-        //     scoreStaked: scoreStaked
-        // });
-
-        // loans[borrower][loanIndex].stake_scores.push(stakeScore);
+        loans[borrower][loanIndex].attestor_address = msg.sender;
+        loans[borrower][loanIndex].scoreStakedAttestor = scoreStaked;
     }
 
     function repay(uint256 loanIndex) public {
@@ -105,7 +96,10 @@ contract FriendFi {
         token.transferFrom(
             msg.sender,
             loans[msg.sender][loanIndex].lender,
-            loans[msg.sender][loanIndex].amountOwed
+            // make sure payback has interest
+            (((loans[msg.sender][loanIndex].amountOwed *
+                (100 + loans[msg.sender][loanIndex].interest)) / 100) *
+                loans[msg.sender][loanIndex].daysToPayBack) / 365
         );
 
         loans[msg.sender][loanIndex].settled = true;
@@ -118,9 +112,16 @@ contract FriendFi {
     function settle(
         address lender,
         uint256 loanIndex,
-        uint256 scoreToBurn
+        uint256 scoreToBurnOG,
+        uint256 scoreToBurnAttestor
     ) public {
-        require(scores[lender] >= scoreToBurn, "Insufficient score");
+        require(
+            loans[lender][loanIndex].scoreStakedOg >= scoreToBurnOG,
+            "Insufficient score OG"
+        );
+        require(
+            loans[lender][loanIndex].scoreStakedAttestor >= scoreToBurnAttestor
+        );
         require(loanIndex < loans[lender].length, "Invalid loan index");
         require(!loans[lender][loanIndex].settled, "Loan already settled");
         require(loans[lender][loanIndex].started, "Loan not started");
@@ -130,6 +131,24 @@ contract FriendFi {
         );
 
         loans[lender][loanIndex].settled = true;
-        scores[lender] -= scoreToBurn;
+
+        // subtraction, but if we're subtracting more than they have make it 0:
+
+        if (scores[lender] < scoreToBurnOG) {
+            scores[lender] = 0;
+        } else {
+            scores[lender] -= scoreToBurnOG;
+        }
+
+        if (
+            scores[loans[lender][loanIndex].attestor_address] <
+            scoreToBurnAttestor
+        ) {
+            scores[loans[lender][loanIndex].attestor_address] = 0;
+        } else {
+            scores[
+                loans[lender][loanIndex].attestor_address
+            ] -= scoreToBurnAttestor;
+        }
     }
 }
