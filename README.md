@@ -2,7 +2,14 @@
 
 Friend To Friend Social-Credit Lending Platform
 
-# TODO SUMARY
+
+Friend.Fi is a groundbreaking friend-to-friend lending platform that revolutionizes borrowing and lending. Unlike traditional systems that require excessive collateral, Friend.Fi utilizes social credit and trust between friends as collateral, eliminating the need for physical assets. 
+
+By introducing soulbound tokens to quantify trust, users can borrow funds based on the trust level established with their friends. Repaying loans increases trust scores, while defaulting decreases them. The platform's network effects allow borrowers to access loans from friends, friends of friends, and beyond. 
+
+The system addresses concerns of fake identities and sybil attacks through WorldId, PolygonId or Sismo. Smart contracts are depolyed to Polygon-ZKEVM, Gnosis Testnet, Linea, and XDC. 
+
+Friend.Fi empowers individuals regardless of their economic status, providing real loans for everyone.
 
 ---
 
