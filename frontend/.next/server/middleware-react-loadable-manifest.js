@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST={"../utils/useMetaMaskOnboarding.ts -> @metamask/onboarding":{"id":"../utils/useMetaMaskOnboarding.ts -> @metamask/onboarding","files":["static/chunks/node_modules_metamask_onboarding_dist_metamask-onboarding_es_js.js"]}}
